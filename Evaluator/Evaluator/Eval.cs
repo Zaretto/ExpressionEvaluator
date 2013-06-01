@@ -11,7 +11,8 @@ namespace Evaluator
          *	return either a double, or a 4 byte unsigned integer (for hex or   
          *      ASCII input of values                                            
          * 
-         *	Author:	R.J.Harrison		Date	15-December-1987          
+         *	Author:	R.J.Harrison		Date	15-December-1987 
+         *	        R.J.Harrison		Date	01-May-2013 - ported from C to C#
         */
 
         Stack<double> stack;
