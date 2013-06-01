@@ -25,9 +25,21 @@ namespace Evaluator
          *	        R.J.Harrison		Date	01-May-2013 - ported from C to C#
         */
 
-        int txtptr = 0; // current character being parsed
-        double fac = 0; // floating point accumulator - following BBC basic naming conventions.
+        /// <summary>
+        /// Floating point accumulator - i.e current value
+        /// </summary>
+        /// <remarks>following BBC basic naming conventions.</remarks>
+        double fac = 0; 
+
+        /// <summary>
+        /// the string being parseed.
+        /// </summary>
         string instring;
+
+        /// <summary>
+        /// position within instring of the current parse location
+        /// </summary>
+        int txtptr = 0;
 
         /// <summary>
         /// Symbol dictionary, i.e. variables and their value. 
@@ -144,8 +156,10 @@ namespace Evaluator
             if (sign == ')')
                 return '\0';
 
+            // at this point we clear the fac as this level will hopefully find a new value for it
             fac = 0;
 
+            // the current sign (symbol).
             sign = instring[txtptr];
 
             /*
@@ -165,25 +179,10 @@ namespace Evaluator
             }
             else
             {
+                // handle any as yet unprocessed signs; the aim of this
+                // is to get a value and store it in the FAC.
                 switch (sign)
                 {
-                    //case '-':
-                    //    txtptr++;
-                    //    negate = !negate;
-                    //    goto restart;
-                    //    break;
-
-                    //case '&' :
-                    //    txtptr++;
-                    //    strg = chex();
-                    //    break;
-
-                    //case '+':
-                    //    txtptr++; // leading + is a no-op.
-                    //    goto restart;
-                    //    //fac = cint();
-                    //break;
-
                     case '(':
                         txtptr++;
                         level1(instring[txtptr]);
@@ -202,7 +201,6 @@ namespace Evaluator
                             var sv = instring.Substring(txtptr, end - txtptr);
                             txtptr = end;
                             fac = Double.Parse(sv);
-                            //          fac = cint();
                             break;
                         }
                 }
