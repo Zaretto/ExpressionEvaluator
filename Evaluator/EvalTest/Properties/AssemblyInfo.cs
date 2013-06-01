@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Evaluator")]
-[assembly: AssemblyDescription("Mathematical Expression Evaluation with symbols and normal bodmas order of precedence")]
+[assembly: AssemblyTitle("EvalTest")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Richard Harrison")]
-[assembly: AssemblyProduct("Evaluator")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("EvalTest")]
 [assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("5807e46e-c372-48fc-85e7-b385cacd9f68")]
+[assembly: Guid("d79e5351-4775-49f7-8029-b3d0ffed12c8")]
 
 // Version information for an assembly consists of the following four values:
 //

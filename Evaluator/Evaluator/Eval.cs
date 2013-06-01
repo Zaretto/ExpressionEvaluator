@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace Evaluator
 {
-    class Eval
+    public class Eval
     {
         /* Expression evaluator
          * Takes a string expression and return either a double value.
@@ -67,7 +64,7 @@ namespace Evaluator
         /// </remarks>
         /// <param name="input"></param>
         /// <returns></returns>
-        public double eval(String input)
+        public double Evaluate(String input)
         {
             instring = input;
             txtptr = 0;

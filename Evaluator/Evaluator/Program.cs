@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Evaluator
@@ -10,7 +9,7 @@ namespace Evaluator
         static Eval x = new Eval();
         static void teval(string v, int expected)
         {
-            var res = x.eval(v);
+            var res = x.Evaluate(v);
             System.Console.WriteLine("{0} = {1}", v, res);
             if (res != expected)
                 System.Console.WriteLine(" Expected {0}", expected);
