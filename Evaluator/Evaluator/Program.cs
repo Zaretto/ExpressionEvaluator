@@ -19,7 +19,9 @@ namespace Evaluator
 
         static void Main(string[] args)
         {
-            teval("ENV.MAIN+ENV.SECONDAY", 0);
+            x.SetSymbol("ENV.MAIN", 20);
+            x.SetSymbol("ENV.SECONDAY", 30);
+            teval("ENV.MAIN+ENV.SECONDAY", 50);
             teval("-10+20", 10);
             teval("-10--30", 20);
             teval("-10-20", -30);

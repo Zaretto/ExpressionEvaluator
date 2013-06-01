@@ -27,6 +27,22 @@ namespace Evaluator
         string instring;
 
         /// <summary>
+        /// Symbol dictionary, i.e. variables and their value. 
+        /// </summary>
+        /// <remarks>
+        /// This is also what we used to call it at Link-Miles, although 
+        /// at Rediffusion they called the same thing DATAPOOL. I think symbol dictionary
+        /// is more elegant a name, and maps nicely onto the C# world because we're using 
+        /// a Dictionary to store it.
+        /// </remarks>
+        Dictionary<string, double> SymbolDictionary = new Dictionary<string, double>();
+
+        public void SetSymbol(string name, double val)
+        {
+            SymbolDictionary[name] = val;
+        }
+
+        /// <summary>
         /// main entry point
         /// </summary>
         /// <remarks>
@@ -141,8 +157,8 @@ namespace Evaluator
                 }
                 var sv = instring.Substring(txtptr, end - txtptr);
                 txtptr = end;
-                Console.WriteLine("Found var {0}", sv);
-                fac = 0;
+                // this will throw an exception if not found. 
+                fac = SymbolDictionary[sv];
             }
             else
             {
