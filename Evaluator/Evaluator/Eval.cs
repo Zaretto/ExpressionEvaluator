@@ -7,13 +7,16 @@ namespace Evaluator
 {
     class Eval
     {
-        /*		Expression evaluator for symon. Will take expression and  
-         *	return either a double, or a 4 byte unsigned integer (for hex or   
-         *  ASCII input of values.
-         *  This is originally based on an understanding gained from disassembling
+        /* Expression evaluator
+         * Takes a string expression and return either a double value.
+         * --------------------------------
+         *  This is originally based on the C version I wrote on my Amiga in 1987, 
+         *  which ended up in symon and this version was based on a BBC Basic version
+         *  which in turn was based on an understanding gained from disassembling
          *  the BBC Basic ROM (6502) in 1981, so credit is due to Richard Florance 
          *  who figured it out first and explained it to me and also to Roger Wilson
          *  who built it in the first place.
+         *  ---
          *  For the C# version I've finally fixed the bug that broke the evaluation order
          *  for operators at the same precedence, originally it was simply recursing back to
          *  the start so 10-20+30 would be evaulated as 10-(20+30). 
