@@ -9,29 +9,49 @@ namespace Evaluator
     {
         /*		Expression evaluator for symon. Will take expression and  
          *	return either a double, or a 4 byte unsigned integer (for hex or   
-         *      ASCII input of values                                            
+         *  ASCII input of values.
+         *  This is originally based on an understanding gained from disassembling
+         *  the BBC Basic ROM (6502) in 1981, so credit is due to Richard Florance 
+         *  who figured it out first and explained it to me and also to Roger Wilson
+         *  who built it in the first place.
+         *  For the C# version I've finally fixed the bug that broke the evaluation order
+         *  for operators at the same precedence, originally it was simply recursing back to
+         *  the start so 10-20+30 would be evaulated as 10-(20+30). 
          * 
          *	Author:	R.J.Harrison		Date	15-December-1987 
          *	        R.J.Harrison		Date	01-May-2013 - ported from C to C#
         */
 
-        Stack<double> stack;
-
-        int txtptr = 0;
-        static double fac = 0;
+        int txtptr = 0; // current character being parsed
+        double fac = 0; // floating point accumulator - following BBC basic naming conventions.
         string instring;
 
+        /// <summary>
+        /// main entry point
+        /// </summary>
+        /// <remarks>
+        /// This works by having different levels each of which is a set of operators at the same
+        /// precedence. The sign that is currently being parsed is returned, it starts at null
+        /// and is reset to null when a bracketed expression has been parsed.
+        /// </remarks>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public double eval(String input)
         {
             instring = input;
             txtptr = 0;
-            stack = new Stack<double>();
             
             level1('\0');
             return fac;
-            //            return type;
         }
 
+        /// <summary>
+        /// no idea why we have two blank levels at the beginning - but it's always been like
+        /// that since 1987, so I'll have to figure out what's missing and then either implement
+        /// them or remove.
+        /// </summary>
+        /// <param name="sign"></param>
+        /// <returns></returns>
         char level1(char sign)
         {
             do
@@ -51,16 +71,16 @@ namespace Evaluator
         {
             if (sign == '+')
             {
-                stack.Push(fac);
+                var cur_fac = fac;
                 sign = level4(sign);
-                fac = stack.Pop() + fac;
+                fac = cur_fac + fac;
                 return sign;
             }
             if (sign == '-')
             {
-                stack.Push(fac);
+                var cur_fac = fac;;
                 sign = level4(sign);
-                fac = stack.Pop() - fac;
+                fac = cur_fac - fac;
                 return sign;
             }
             return level4(sign);
@@ -70,16 +90,16 @@ namespace Evaluator
         {
             if (sign == '*')
             {
-                stack.Push(fac);
+                var cur_fac = fac;;
                 sign = level5(sign);
-                fac = stack.Pop() * fac;
+                fac = cur_fac * fac;
                 return sign;
             }
             if (sign == '/')
             {
-                stack.Push(fac);
+                var cur_fac = fac;;
                 sign = level5(sign);
-                fac = stack.Pop() / fac;
+                fac = cur_fac / fac;
                 return sign;
             }
             return level5(sign);
@@ -89,9 +109,9 @@ namespace Evaluator
         {
             if (sign == '^')
             {
-                stack.Push(fac);
+                var cur_fac = fac;;
                 sign = level6(sign);
-                fac = Math.Pow(stack.Pop(), fac);
+                fac = Math.Pow(cur_fac, fac);
                 return sign;
             }
             return level6(sign);
