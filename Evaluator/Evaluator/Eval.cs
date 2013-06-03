@@ -29,14 +29,28 @@ namespace Evaluator
         double fac = 0;
 
         /// <summary>
+        /// the recursion depth - which generally is the same as the bracket level i.e.
+        /// X+(A-B)
+        /// depth = 1 then (2) whilst evaluating A-B. Again for context in the GetSymbol
+        /// virtual method.
+        /// </summary>
+        protected int CurrentDepth;
+
+        /// <summary>
         /// the string being parseed.
         /// </summary>
-        string instring;
+        string Expression;
 
         /// <summary>
         /// position within instring of the current parse location
         /// </summary>
-        int txtptr = 0;
+        int ExpressionPosition = 0;
+
+        /// <summary>
+        /// The operator symbol for the current operation; can be useful in GetSymbol to ascertain context.
+        /// This is only valid after level6 has been reached
+        /// </summary>
+        protected char CurrentOperator;
 
         /// <summary>
         /// Symbol dictionary, i.e. variables and their value. 
@@ -54,7 +68,7 @@ namespace Evaluator
             SymbolDictionary[name] = val;
         }
 
-        public virtual double GetSymbol(string name)
+        public virtual double GetSymbol(string name, char Operator)
         {
             return SymbolDictionary[name];
         }
@@ -64,16 +78,16 @@ namespace Evaluator
         /// </summary>
         /// <remarks>
         /// This works by having different levels each of which is a set of operators at the same
-        /// precedence. The sign that is currently being parsed is returned, it starts at null
+        /// precedence. The Operator that is currently being parsed is returned, it starts at null
         /// and is reset to null when a bracketed expression has been parsed.
         /// </remarks>
         /// <param name="input"></param>
         /// <returns></returns>
         public double Evaluate(String input)
         {
-            instring = input;
-            txtptr = 0;
-
+            Expression = input;
+            ExpressionPosition = 0;
+            CurrentDepth = 0;
             level1('\0');
             return fac;
         }
@@ -83,158 +97,169 @@ namespace Evaluator
         /// that since 1987, so I'll have to figure out what's missing and then either implement
         /// them or remove.
         /// </summary>
-        /// <param name="sign"></param>
+        /// <param name="Operator"></param>
         /// <returns></returns>
-        char level1(char sign)
+        char level1(char Operator)
         {
+            CurrentDepth++;
             do
             {
-                sign = level2(sign);
+                Operator = level2(Operator);
             }
-            while (sign > 0);
-            return sign;
+            while (Operator > 0);
+            return Operator;
         }
 
-        char level2(char sign)
+        char level2(char Operator)
         {
-            return level3(sign);
+            return level3(Operator);
         }
 
-        char level3(char sign)
+        char level3(char Operator)
         {
-            if (sign == '+')
+            if (Operator == '+')
             {
                 var cur_fac = fac;
-                sign = level4(sign);
+                Operator = level4(Operator);
                 fac = cur_fac + fac;
-                return sign;
+                return Operator;
             }
-            if (sign == '-')
+            if (Operator == '-')
             {
                 var cur_fac = fac; ;
-                sign = level4(sign);
+                Operator = level4(Operator);
                 fac = cur_fac - fac;
-                return sign;
+                return Operator;
             }
-            return level4(sign);
+            return level4(Operator);
         }
 
-        char level4(char sign)
+        char level4(char Operator)
         {
-            if (sign == '*')
+            if (Operator == '*')
             {
                 var cur_fac = fac; ;
-                sign = level5(sign);
+                Operator = level5(Operator);
                 fac = cur_fac * fac;
-                return sign;
+                return Operator;
             }
-            if (sign == '/')
+            if (Operator == '/')
             {
                 var cur_fac = fac; ;
-                sign = level5(sign);
+                Operator = level5(Operator);
                 fac = cur_fac / fac;
-                return sign;
+                return Operator;
             }
-            return level5(sign);
+            return level5(Operator);
         }
 
-        char level5(char sign)
+        char level5(char Operator)
         {
-            if (sign == '^')
+            if (Operator == '^')
             {
                 var cur_fac = fac; ;
-                sign = level6(sign);
+                Operator = level6(Operator);
                 fac = Math.Pow(cur_fac, fac);
-                return sign;
+                return Operator;
             }
-            return level6(sign);
+            return level6(Operator);
         }
 
-        char level6(char sign)
+        char nextOperator()
+        {
+            char Operator;
+            while (ExpressionPosition < Expression.Length && Char.IsWhiteSpace(Expression[ExpressionPosition]))
+                ExpressionPosition++;
+            if (ExpressionPosition < Expression.Length)
+                Operator = Expression[ExpressionPosition++];
+            else
+            {
+                Operator = '\0';
+            }
+            return Operator;
+        }
+        char level6(char Operator)
         {
             /*
              * see if end of bracketed expression
              */
-            if (sign == ')')
+            CurrentOperator = Operator;
+            if (Operator == ')')
                 return '\0';
 
             // at this point we clear the fac as this level will hopefully find a new value for it
             fac = 0;
 
 
-            if (txtptr >= instring.Length)
+            if (ExpressionPosition >= Expression.Length)
                 return '\0';
 
-            while (txtptr < instring.Length && Char.IsWhiteSpace(instring[txtptr]))
-                txtptr++;
+            while (ExpressionPosition < Expression.Length && Char.IsWhiteSpace(Expression[ExpressionPosition]))
+                ExpressionPosition++;
 
-            // the current sign (symbol).
-            sign = instring[txtptr];
+            // the current Operator (symbol).
+            Operator = Expression[ExpressionPosition];
 
             /*
              * handle variables
              */
-            if (sign == '\'')
+            if (Operator == '\'')
             {
-                int end = ++txtptr;
-                while (end < instring.Length && instring[end] != '\'')
+                int end = ++ExpressionPosition;
+                while (end < Expression.Length && Expression[end] != '\'')
                 {
                     end++;
                 }
-                var sv = instring.Substring(txtptr, end - txtptr);
-                txtptr = end + 1;
+                var sv = Expression.Substring(ExpressionPosition, end - ExpressionPosition);
+                ExpressionPosition = end + 1;
                 // this will throw an exception if not found. 
-                fac = GetSymbol(sv);
+                Operator = nextOperator();
+                fac = GetSymbol(sv, Operator);
             }
-            else if (Char.IsLetter(sign))
+            else if (Char.IsLetter(Operator))
             {
-                int end = txtptr;
-                while (end < instring.Length && (instring[end] == '.' || Char.IsLetterOrDigit(instring[end])))
+                int end = ExpressionPosition;
+                while (end < Expression.Length && (Expression[end] == '.' || Char.IsLetterOrDigit(Expression[end])))
                 {
                     end++;
                 }
-                var sv = instring.Substring(txtptr, end - txtptr);
-                txtptr = end;
+                var sv = Expression.Substring(ExpressionPosition, end - ExpressionPosition);
+                ExpressionPosition = end;
                 // this will throw an exception if not found. 
-                fac = GetSymbol(sv);
+                Operator = nextOperator();
+                fac = GetSymbol(sv, Operator);
             }
             else
             {
-                // handle any as yet unprocessed signs; the aim of this
+                // handle any as yet unprocessed Operators; the aim of this
                 // is to get a value and store it in the FAC.
-                switch (sign)
+                switch (Operator)
                 {
                     case '(':
-                        txtptr++;
-                        level1(instring[txtptr]);
+                        ExpressionPosition++;
+                        level1(Expression[ExpressionPosition]);
                         break;
 
                     default:
                         {
-                            var end = txtptr;
+                            var end = ExpressionPosition;
                             bool can_negate = true;
-                            while (end < instring.Length
-                                   && (Char.IsDigit(instring[end]) || instring[end] == '.' || (can_negate && instring[end] == '-')))
+                            while (end < Expression.Length
+                                   && (Char.IsDigit(Expression[end]) || Expression[end] == '.' || (can_negate && Expression[end] == '-')))
                             {
                                 can_negate = false;
                                 end++;
                             }
-                            var sv = instring.Substring(txtptr, end - txtptr);
-                            txtptr = end;
+                            var sv = Expression.Substring(ExpressionPosition, end - ExpressionPosition);
+                            ExpressionPosition = end;
                             fac = Double.Parse(sv);
                             break;
                         }
                 }
+                Operator = nextOperator();
             }
-            while (txtptr < instring.Length && Char.IsWhiteSpace(instring[txtptr]))
-                txtptr++;
-            if (txtptr < instring.Length)
-                sign = instring[txtptr++];
-            else
-            {
-                sign = '\0';
-            }
-            return sign;
+            return Operator;
         }
     }
+
 }
