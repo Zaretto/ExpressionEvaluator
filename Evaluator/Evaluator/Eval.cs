@@ -26,7 +26,7 @@ namespace Evaluator
         /// Floating point accumulator - i.e current value
         /// </summary>
         /// <remarks>following BBC basic naming conventions.</remarks>
-        double fac = 0; 
+        double fac = 0;
 
         /// <summary>
         /// the string being parseed.
@@ -49,9 +49,14 @@ namespace Evaluator
         /// </remarks>
         Dictionary<string, double> SymbolDictionary = new Dictionary<string, double>();
 
-        public void SetSymbol(string name, double val)
+        public virtual void SetSymbol(string name, double val)
         {
             SymbolDictionary[name] = val;
+        }
+
+        public virtual double GetSymbol(string name)
+        {
+            return SymbolDictionary[name];
         }
 
         /// <summary>
@@ -68,7 +73,7 @@ namespace Evaluator
         {
             instring = input;
             txtptr = 0;
-            
+
             level1('\0');
             return fac;
         }
@@ -106,7 +111,7 @@ namespace Evaluator
             }
             if (sign == '-')
             {
-                var cur_fac = fac;;
+                var cur_fac = fac; ;
                 sign = level4(sign);
                 fac = cur_fac - fac;
                 return sign;
@@ -118,14 +123,14 @@ namespace Evaluator
         {
             if (sign == '*')
             {
-                var cur_fac = fac;;
+                var cur_fac = fac; ;
                 sign = level5(sign);
                 fac = cur_fac * fac;
                 return sign;
             }
             if (sign == '/')
             {
-                var cur_fac = fac;;
+                var cur_fac = fac; ;
                 sign = level5(sign);
                 fac = cur_fac / fac;
                 return sign;
@@ -137,7 +142,7 @@ namespace Evaluator
         {
             if (sign == '^')
             {
-                var cur_fac = fac;;
+                var cur_fac = fac; ;
                 sign = level6(sign);
                 fac = Math.Pow(cur_fac, fac);
                 return sign;
@@ -156,13 +161,32 @@ namespace Evaluator
             // at this point we clear the fac as this level will hopefully find a new value for it
             fac = 0;
 
+
+            if (txtptr >= instring.Length)
+                return '\0';
+
+            while (txtptr < instring.Length && Char.IsWhiteSpace(instring[txtptr]))
+                txtptr++;
+
             // the current sign (symbol).
             sign = instring[txtptr];
 
             /*
              * handle variables
              */
-            if (Char.IsLetter(sign))
+            if (sign == '\'')
+            {
+                int end = ++txtptr;
+                while (end < instring.Length && instring[end] != '\'')
+                {
+                    end++;
+                }
+                var sv = instring.Substring(txtptr, end - txtptr);
+                txtptr = end + 1;
+                // this will throw an exception if not found. 
+                fac = GetSymbol(sv);
+            }
+            else if (Char.IsLetter(sign))
             {
                 int end = txtptr;
                 while (end < instring.Length && (instring[end] == '.' || Char.IsLetterOrDigit(instring[end])))
@@ -172,7 +196,7 @@ namespace Evaluator
                 var sv = instring.Substring(txtptr, end - txtptr);
                 txtptr = end;
                 // this will throw an exception if not found. 
-                fac = SymbolDictionary[sv];
+                fac = GetSymbol(sv);
             }
             else
             {
@@ -202,8 +226,10 @@ namespace Evaluator
                         }
                 }
             }
+            while (txtptr < instring.Length && Char.IsWhiteSpace(instring[txtptr]))
+                txtptr++;
             if (txtptr < instring.Length)
-                sign = instring [txtptr++];
+                sign = instring[txtptr++];
             else
             {
                 sign = '\0';
