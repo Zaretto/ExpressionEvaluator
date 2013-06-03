@@ -11,9 +11,37 @@ namespace EvalTest
         public void Symbols()
         {
             var eval = new Eval();
-            eval.SetSymbol("ENV.MAIN",20);
-            eval.SetSymbol("ENV.SECONDAY",30);
+            eval.SetSymbol("ENV.MAIN", 20);
+            eval.SetSymbol("ENV.SECONDAY", 30);
             Assert.IsTrue(eval.Evaluate("ENV.MAIN+ENV.SECONDAY") == 50);
+        }
+        [TestMethod]
+        public void QuotedSymbols()
+        {
+            var eval = new Eval();
+            eval.SetSymbol("ENV.MAIN", 20);
+            eval.SetSymbol("ENV.SECONDAY", 30);
+            Assert.IsTrue(eval.Evaluate("'ENV.MAIN'+'ENV.SECONDAY'") == 50);
+
+            eval.SetSymbol("ENV MAIN", 20);
+            eval.SetSymbol("ENV SECONDAY", 30);
+            Assert.IsTrue(eval.Evaluate("'ENV MAIN'+'ENV SECONDAY'") == 50);
+
+            eval.SetSymbol("ENV-MAIN", 20);
+            eval.SetSymbol("ENV-SECONDAY", 30);
+            Assert.IsTrue(eval.Evaluate("'ENV-MAIN'+'ENV-SECONDAY'") == 50);
+
+        }
+        [TestMethod]
+        public void Whitespace()
+        {
+            var eval = new Eval();
+            eval.SetSymbol("ENV MAIN", 20);
+            eval.SetSymbol("ENV SECONDAY", 30);
+            Assert.IsTrue(eval.Evaluate("'ENV MAIN' +'ENV SECONDAY'") == 50);
+            Assert.IsTrue(eval.Evaluate("'ENV MAIN'+ 'ENV SECONDAY'") == 50);
+            Assert.IsTrue(eval.Evaluate("'ENV MAIN' + 'ENV SECONDAY'") == 50);
+            Assert.IsTrue(eval.Evaluate("'ENV MAIN' +  'ENV SECONDAY'") == 50);
         }
         [TestMethod]
         public void AdditionAndSubtraction()
