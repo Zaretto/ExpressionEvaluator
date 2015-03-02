@@ -11,37 +11,84 @@ namespace EvalTest
         public void Symbols()
         {
             var eval = new Eval();
-            eval.SetSymbol("ENV.MAIN", 20);
-            eval.SetSymbol("ENV.SECONDAY", 30);
-            Assert.IsTrue(eval.Evaluate("ENV.MAIN+ENV.SECONDAY") == 50);
+            eval.SetSymbol("TVAR.MAIN", 20);
+            eval.SetSymbol("TVAR.SECONDAY", 30);
+            Assert.IsTrue(eval.Evaluate("TVAR.MAIN+TVAR.SECONDAY") == 50);
         }
         [TestMethod]
         public void QuotedSymbols()
         {
             var eval = new Eval();
-            eval.SetSymbol("ENV.MAIN", 20);
-            eval.SetSymbol("ENV.SECONDAY", 30);
-            Assert.IsTrue(eval.Evaluate("'ENV.MAIN'+'ENV.SECONDAY'") == 50);
+            eval.SetSymbol("TVAR.MAIN", 20);
+            eval.SetSymbol("TVAR.SECONDAY", 30);
+            Assert.IsTrue(eval.Evaluate("'TVAR.MAIN'+'TVAR.SECONDAY'") == 50);
 
-            eval.SetSymbol("ENV MAIN", 20);
-            eval.SetSymbol("ENV SECONDAY", 30);
-            Assert.IsTrue(eval.Evaluate("'ENV MAIN'+'ENV SECONDAY'") == 50);
+            eval.SetSymbol("TVAR MAIN", 20);
+            eval.SetSymbol("TVAR SECONDAY", 30);
+            Assert.IsTrue(eval.Evaluate("'TVAR MAIN'+'TVAR SECONDAY'") == 50);
 
-            eval.SetSymbol("ENV-MAIN", 20);
-            eval.SetSymbol("ENV-SECONDAY", 30);
-            Assert.IsTrue(eval.Evaluate("'ENV-MAIN'+'ENV-SECONDAY'") == 50);
+            eval.SetSymbol("TVAR-MAIN", 20);
+            eval.SetSymbol("TVAR-SECONDAY", 30);
+            Assert.IsTrue(eval.Evaluate("'TVAR-MAIN'+'TVAR-SECONDAY'") == 50);
+
+        }
+        [TestMethod]
+        public void ExtraOperatorError()
+        {
+            var s = "('Var1' 'Var2')";
+            try
+            {
+                var eval = new NoSymEval();
+                eval.Evaluate(s);
+                Assert.Fail("Expression should produce symbol error");
+            }
+            catch (Exception e)
+            {
+                Assert.IsTrue(e is InvalidOperationException, "Unexpected " + e.ToString());
+            }
+        }
+        [TestMethod]
+        public void CurrentValueTest()
+        {
+            var s = "(1.2+'V2')";
+            try
+            {
+                var eval = new NoSymEval();
+                eval.Evaluate(s);
+                Assert.AreEqual(eval.currentValueList.Count,1);
+                Assert.AreEqual(eval.currentValueList[0], 1.2);
+            }
+            catch (Exception e)
+            {
+                Assert.IsTrue(e is InvalidOperationException, "Unexpected " + e.ToString());
+            }
+        }
+        [TestMethod]
+        public void MissingOperatorError()
+        {
+            var s = "('Var1'+'Var2')- ";
+            try
+            {
+                var eval = new NoSymEval();
+                eval.Evaluate(s);
+                Assert.Fail("Expression should produce symbol error");
+            }
+            catch(Exception e)
+            {
+                Assert.IsTrue(e is InvalidOperationException, "Unexpected "+e.ToString());
+            }
 
         }
         [TestMethod]
         public void Whitespace()
         {
             var eval = new Eval();
-            eval.SetSymbol("ENV MAIN", 20);
-            eval.SetSymbol("ENV SECONDAY", 30);
-            Assert.IsTrue(eval.Evaluate("'ENV MAIN' +'ENV SECONDAY'") == 50);
-            Assert.IsTrue(eval.Evaluate("'ENV MAIN'+ 'ENV SECONDAY'") == 50);
-            Assert.IsTrue(eval.Evaluate("'ENV MAIN' + 'ENV SECONDAY'") == 50);
-            Assert.IsTrue(eval.Evaluate("'ENV MAIN' +  'ENV SECONDAY'") == 50);
+            eval.SetSymbol("TVAR MAIN", 20);
+            eval.SetSymbol("TVAR SECONDAY", 30);
+            Assert.IsTrue(eval.Evaluate("'TVAR MAIN' +'TVAR SECONDAY'") == 50);
+            Assert.IsTrue(eval.Evaluate("'TVAR MAIN'+ 'TVAR SECONDAY'") == 50);
+            Assert.IsTrue(eval.Evaluate("'TVAR MAIN' + 'TVAR SECONDAY'") == 50);
+            Assert.IsTrue(eval.Evaluate("'TVAR MAIN' +  'TVAR SECONDAY'") == 50);
         }
         [TestMethod]
         public void AdditionAndSubtraction()

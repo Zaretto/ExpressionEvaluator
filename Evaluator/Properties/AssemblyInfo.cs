@@ -14,8 +14,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("Release")]
 #endif
 [assembly: AssemblyCompany("Zaretto")]
-[assembly: AssemblyProduct("ReadablePasswordGenerator")]
-[assembly: AssemblyCopyright("Copyright ©  2013 Richard Hazrrison")]
+[assembly: AssemblyProduct("Eval")]
+[assembly: AssemblyCopyright("Copyright ©  2015 Richard Hazrrison")]
 [assembly: AssemblyCulture("")]
 [assembly: NeutralResourcesLanguage("en")]
 
@@ -37,5 +37,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.1")]
-[assembly: AssemblyFileVersion("1.0.0.1")]
+[assembly: AssemblyVersion("1.0.0.4")]
+[assembly: AssemblyFileVersion("1.0.0.4")]

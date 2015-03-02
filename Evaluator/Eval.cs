@@ -20,13 +20,19 @@ namespace Evaluator
          * 
          *	Author:	R.J.Harrison		Date	15-December-1987 
          *	        R.J.Harrison		Date	01-May-2013 - ported from C to C#
+         *	        R.J.Harrison        Date    19-Feb-2015 - Make properties protected
         */
 
         /// <summary>
         /// Floating point accumulator - i.e current value
         /// </summary>
         /// <remarks>following BBC basic naming conventions.</remarks>
-        double fac = 0;
+        protected double fac = 0;
+
+        /// <summary>
+        /// current value of fac
+        /// </summary>
+        protected double cur_fac;
 
         /// <summary>
         /// the recursion depth - which generally is the same as the bracket level i.e.
@@ -39,12 +45,12 @@ namespace Evaluator
         /// <summary>
         /// the string being parseed.
         /// </summary>
-        string Expression;
+        protected string Expression;
 
         /// <summary>
         /// position within instring of the current parse location
         /// </summary>
-        int ExpressionPosition = 0;
+        protected int ExpressionPosition = 0;
 
         /// <summary>
         /// The operator symbol for the current operation; can be useful in GetSymbol to ascertain context.
@@ -61,7 +67,7 @@ namespace Evaluator
         /// is more elegant a name, and maps nicely onto the C# world because we're using 
         /// a Dictionary to store it.
         /// </remarks>
-        Dictionary<string, double> SymbolDictionary = new Dictionary<string, double>();
+        protected Dictionary<string, double> SymbolDictionary = new Dictionary<string, double>();
 
         public virtual void SetSymbol(string name, double val)
         {
@@ -187,6 +193,7 @@ namespace Evaluator
             if (Operator == ')')
                 return '\0';
 
+            cur_fac = fac;
             // at this point we clear the fac as this level will hopefully find a new value for it
             fac = 0;
 
@@ -198,6 +205,8 @@ namespace Evaluator
                 ExpressionPosition++;
 
             // the current Operator (symbol).
+            if (ExpressionPosition >= Expression.Length)
+                throw new InvalidOperationException("Expression incomplete at end of expression");
             Operator = Expression[ExpressionPosition];
 
             /*
@@ -214,6 +223,8 @@ namespace Evaluator
                 ExpressionPosition = end + 1;
                 // this will throw an exception if not found. 
                 Operator = nextOperator();
+                if (Operator == '\'' || Char.IsLetterOrDigit(Operator))
+                    throw new InvalidOperationException("Unexpected symbol at character " + ExpressionPosition.ToString());
                 fac = GetSymbol(sv, Operator);
             }
             else if (Char.IsLetter(Operator))
@@ -227,6 +238,8 @@ namespace Evaluator
                 ExpressionPosition = end;
                 // this will throw an exception if not found. 
                 Operator = nextOperator();
+                if (Operator == '\'' || Char.IsLetterOrDigit(Operator))
+                    throw new InvalidOperationException("Unexpected symbol at character " + ExpressionPosition.ToString());
                 fac = GetSymbol(sv, Operator);
             }
             else
@@ -239,13 +252,15 @@ namespace Evaluator
                         ExpressionPosition++;
                         level1(Expression[ExpressionPosition]);
                         break;
+                    case ')':
+                        throw new InvalidOperationException("Unexpected closing bracket at character " + ExpressionPosition.ToString());
 
                     default:
                         {
                             var end = ExpressionPosition;
                             bool can_negate = true;
                             while (end < Expression.Length
-                                   && (Char.IsDigit(Expression[end]) || Expression[end] == '.' || (can_negate && Expression[end] == '-')))
+                                   && (Char.IsWhiteSpace(Expression[end]) || Char.IsDigit(Expression[end]) || Expression[end] == '.' || (can_negate && Expression[end] == '-')))
                             {
                                 can_negate = false;
                                 end++;
