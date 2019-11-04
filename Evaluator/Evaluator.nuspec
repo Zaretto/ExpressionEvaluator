@@ -11,5 +11,8 @@
     <description>$description$</description>
     <copyright>Copyright 2013</copyright>
     <tags>Expression Evaulator Mathematical Expressions</tags>
+    <releaseNotes>
+    1.1.0 - Added equation evaulation. Fixed order of precedence faults.
+    </releaseNotes>
   </metadata>
 </package>
