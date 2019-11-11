@@ -370,7 +370,7 @@ namespace Evaluator
                         else
                         {
                             var evalulatedValue = Evaluate(parts[1]);
-                            System.Console.WriteLine("Calculate {0}", evalulatedValue);
+//                            System.Console.WriteLine("Calculate {0}", evalulatedValue);
                             return evalulatedValue;
                             //System.Console.WriteLine("ERROR: bad numeber format {0}", parts[1]);
                         }
